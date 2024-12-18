@@ -1,0 +1,44 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+public class HotelRoomDAO {
+    // Méthode pour obtenir tous les hôtels avec leurs étoiles, types de chambres et prix
+    public List<String> getHotelsWithDetails() {
+        List<String> hotelDetails = new ArrayList<>();
+        Connection conn = SingleConnection.getInstance();
+        if (conn == null) {
+            System.out.println("Connexion à la base de données échouée.");
+            return hotelDetails;
+        }
+
+        String query = "SELECT h.hotel_name, h.stars, r.room_type, r.price "
+                     + "FROM hotels h "
+                     + "JOIN rooms r ON h.hotel_id = r.hotel_id";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Exécuter la requête
+            ResultSet rs = stmt.executeQuery();
+
+            // Parcourir les résultats
+            while (rs.next()) {
+                String hotelName = rs.getString("hotel_name");
+                int stars = rs.getInt("stars");
+                String roomType = rs.getString("room_type");
+                double price = rs.getDouble("price");
+
+                hotelDetails.add("Hotel: " + hotelName + ", Stars: " + stars + ", Room Type: " + roomType + ", Price: " + price + " TND");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'exécution de la requête.");
+            e.printStackTrace();
+        }
+
+        return hotelDetails;
+    }
+}

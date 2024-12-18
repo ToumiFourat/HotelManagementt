@@ -1,0 +1,80 @@
+import dao.Hoteldao;
+import model.Hotel;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class SearchServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private Hoteldao hoteldao;
+
+    /**
+     * Default constructor
+     */
+    public SearchServlet() {
+        super();
+    }
+
+    /**
+     * Initializes the servlet
+     */
+    @Override
+    public void init() throws ServletException {
+        hoteldao = new Hoteldao();
+    }
+
+    /**
+     * Handles GET requests
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String city = request.getParameter("city");
+        String starsParam = request.getParameter("stars");
+        String roomTypeLabel = request.getParameter("roomType");
+        String capacityParam = request.getParameter("capacity");
+        String minPriceParam = request.getParameter("minPrice");
+        String maxPriceParam = request.getParameter("maxPrice");
+
+        List<Hotel> hotels = new ArrayList<>();
+
+        try {
+            // Validation des paramètres
+            int stars = starsParam != null ? Integer.parseInt(starsParam) : 0;
+            int capacity = capacityParam != null ? Integer.parseInt(capacityParam) : 0;
+            double minPrice = minPriceParam != null ? Double.parseDouble(minPriceParam) : 0;
+            double maxPrice = maxPriceParam != null ? Double.parseDouble(maxPriceParam) : Double.MAX_VALUE;
+
+            hotels = hoteldao.getHotelsWithRoomTypes(city, stars, roomTypeLabel, capacity, minPrice, maxPrice);
+
+            request.setAttribute("hotels", hotels);
+            request.getRequestDispatcher("views/index.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            request.setAttribute("message", "Input format invalid");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
+        }
+    }
+
+
+    /**
+     * Handles POST requests
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+}

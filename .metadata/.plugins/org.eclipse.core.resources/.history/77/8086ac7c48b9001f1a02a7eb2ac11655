@@ -1,0 +1,206 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+	<%@ page import="java.util.List" %>
+<%@ page import="model.Hotel" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel Search</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: #fff;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+
+        .results {
+            margin-top: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-item img {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .result-item:hover {
+            transform: scale(1.05);
+        }
+
+        .result-item h3 {
+            margin: 0;
+            color: #fff;
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            color: #ddd;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel Search</h1>
+        <form action="${pageContext.request.contextPath}/SearchServlet"  method="post">
+        <label>City:</label>
+        <select name="city" required>
+            <option value="Ariana">Ariana</option>
+            <option value="Sousse">Sousse</option>
+            <option value="Monastir">Monastir</option>
+        </select>
+
+        <label>Number of Stars:</label>
+        <select name="stars" required>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+
+        <label>Room Type:</label>
+        <select name="roomType" required>
+            <option value="gardenView">Garden View</option>
+            <option value="seaView">Sea View</option>
+            <option value="suite">Suite</option>
+        </select>
+
+        <label>Maximum Capacity:</label>
+        <select name="capacity" required>
+            <option value="1">1 Person</option>
+            <option value="2">2 People</option>
+            <option value="3">3 People</option>
+            <option value="4">4 People</option>
+        </select>
+
+        <label>Min Price:</label>
+        <input type="number" name="minPrice" min="0" required>
+
+        <label>Max Price:</label>
+        <input type="number" name="maxPrice" min="0" required>
+
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+    <!-- Afficher les résultats si disponibles -->
+    <div class="results">
+    <h2>Search Results:</h2>
+    <%
+        List<Map<String, String>> hotels = (List<Map<String, String>>) request.getAttribute("hotelResults");
+        if (hotels != null && !hotels.isEmpty()) {
+            for (Map<String, String> hotel : hotels) {
+    %>
+    <div class="result-item">
+        <img src="<%= hotel.get("image") != null ? hotel.get("image") : "images/hotel3.avif" %>" alt="Hotel Image">
+        <div>
+            <h3><%= hotel.get("name") %></h3>
+            <p>Stars: <%= hotel.get("stars") %></p>
+            <p>Room Type: <%= hotel.get("roomType") %></p>
+            <p>Price: <%= hotel.get("price") %> per night</p>
+        </div>
+    </div>
+    <%
+            }
+        } else {
+    %>
+        <p>No hotels found based on your search criteria.</p>
+    <%
+        }
+    %>
+</div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Récupération des paramètres du formulaire après soumission
+    String city = request.getParameter("city");
+    String stars = request.getParameter("stars");
+    String roomType = request.getParameter("roomType");
+    String capacity = request.getParameter("capacity");
+    String minPrice = request.getParameter("minPrice");
+    String maxPrice = request.getParameter("maxPrice");
+
+    boolean showResults = (city != null && !city.isEmpty()) || 
+                           (stars != null && !stars.isEmpty()) || 
+                           (roomType != null && !roomType.isEmpty());
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel Search</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: #fff;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            color: black;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel Search</h1>
+        <form method="POST" action="index.jsp">
+            <label for="city">City:</label>
+            <select name="city" id="city">
+                <option value="">Select</option>
+                <option value="Ariana">Ariana</option>
+                <option value="Béja">Béja</option>
+                <option value="Ben Arous">Ben Arous</option>
+            </select>
+
+            <label for="stars">Number of Stars:</label>
+            <select name="stars" id="stars">
+                <option value="">Select</option>
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+            </select>
+
+            <label for="roomType">Room Type:</label>
+            <select name="roomType" id="roomType">
+                <option value="">Select</option>
+                <option value="gardenView">Chambre vue jardin</option>
+                <option value="seaView">Chambre vue mer</option>
+            </select>
+
+            <label for="capacity">Maximum Capacity:</label>
+            <select name="capacity" id="capacity">
+                <option value="">Select</option>
+                <option value="1">1 Personne</option>
+                <option value="2">2 Personnes</option>
+            </select>
+
+            <label for="minPrice">Min Price (per night):</label>
+            <input type="number" name="minPrice" id="minPrice">
+
+            <label for="maxPrice">Max Price (per night):</label>
+            <input type="number" name="maxPrice" id="maxPrice">
+
+            <button type="submit">Search</button>
+        </form>
+
+        <%
+            // Afficher les résultats uniquement après soumission du formulaire
+            if (showResults) {
+        %>
+            <div class="results">
+                <h2>Search Results:</h2>
+                <div class="result-item">
+                    <p><strong>City:</strong> <%= city %></p>
+                    <p><strong>Stars:</strong> <%= stars %></p>
+                    <p><strong>Room Type:</strong> <%= roomType %></p>
+                    <p><strong>Capacity:</strong> <%= capacity %></p>
+                    <p><strong>Price range:</strong> From $<%= minPrice %> to $<%= maxPrice %></p>
+                </div>
+            </div>
+        <%
+            }
+        %>
+    </div>
+</body>
+</html>

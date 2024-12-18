@@ -1,0 +1,87 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Room</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #8e44ad, #2980b9);
+            color: #fff;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            width: 50%;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Room</h1>
+        <form action="${pageContext.request.contextPath}/UpdateRoomTypeServlet" method="post">
+            <!-- Hidden ID for identifying the room type -->
+            <input type="hidden" name="id" value="${param.id}" />
+
+            <!-- Dropdown for selecting hotel -->
+            <label for="hotel">Hotel:</label>
+            <select id="hotelId" name="hotelId" required>
+                <!-- Options dynamiques -->
+                <c:forEach var="hotel" items="${hotels}">
+                    <option value="${hotel.id}" ${hotel.id == param.hotelId ? "selected" : ""}>
+                        ${hotel.name}
+                    </option>
+                </c:forEach>
+            </select>
+
+            <label for="label">Room Type:</label>
+            <input type="text" id="label" name="label" value="${param.label}" required />
+
+            <label for="capacity">Capacity:</label>
+            <input type="number" id="capacity" name="capacity" value="${param.capacity}" required min="1" />
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" value="${param.price}" required min="0" />
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

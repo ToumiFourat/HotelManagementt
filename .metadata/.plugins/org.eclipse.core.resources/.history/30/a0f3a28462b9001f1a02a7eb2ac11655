@@ -1,0 +1,76 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+public class HotelRoomDAO {
+
+    private Connection connection;
+
+    public HotelRoomDAO() {
+        connection = SingleConnection.getInstance();
+    }
+
+    // Méthode pour rechercher les hôtels avec critères dynamiques
+    public List<String> getHotelsWithDetails(String city, int minStars, String roomType, int maxCapacity, double minPrice, double maxPrice) {
+        List<String> hotelDetails = new ArrayList<>();
+
+        // Requête SQL avec jointures et paramètres
+        String query = "SELECT " +
+                "    h.name AS hotel_name, " +
+                "    h.stars AS number_of_stars, " +
+                "    h.city AS city, " +
+                "    rt.label AS room_type, " +
+                "    rt.prix AS price, " +
+                "    rt.capacity AS capacity, " +
+                "    h.image AS image_url " +
+                "FROM " +
+                "    Hotel h " +
+                "JOIN " +
+                "    HotelRoom hr ON h.id = hr.hotel_id " +
+                "JOIN " +
+                "    RoomType rt ON hr.room_type_id = rt.id " +
+                "WHERE " +
+                "    h.city = ? AND " +
+                "    h.stars >= ? AND " +
+                "    rt.capacity <= ? AND " +
+                "    rt.label = ? AND " +
+                "    rt.prix BETWEEN ? AND ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            // Remplacer les "?" par les valeurs dynamiques
+        	 stmt.setString(1, city);
+             stmt.setInt(2, minStars);
+             stmt.setInt(3, maxCapacity);
+             stmt.setString(4, roomType);
+             stmt.setDouble(5, minPrice);
+             stmt.setDouble(6, maxPrice);
+
+            // Exécuter la requête
+            ResultSet rs = stmt.executeQuery();
+
+            // Parcourir les résultats
+            while (rs.next()) {
+                String hotelName = rs.getString("hotel_name");
+                int stars = rs.getInt("number_of_stars");
+                String hotelCity = rs.getString("city");
+                String roomLabel = rs.getString("room_type");
+                double price = rs.getDouble("price");
+                int capacity = rs.getInt("capacity");
+
+                hotelDetails.add("Hotel: " + hotelName + ", City: " + hotelCity + 
+                                 ", Stars: " + stars + ", Room Type: " + roomLabel + 
+                                 ", Capacity: " + capacity + ", Price: " + price + " TND");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'exécution de la requête.");
+            e.printStackTrace();
+        }
+
+        return hotelDetails;
+    }
+}

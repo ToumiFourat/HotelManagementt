@@ -1,0 +1,188 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.Statement;
+import model.Roomtype;
+
+public class RoomTypeDAO {
+
+    private Connection connection;
+
+    public RoomTypeDAO() {
+        connection = SingleConnection.getInstance();
+    }
+
+    public boolean addRoomType(Roomtype roomType, int hotelId) throws SQLException {
+        // Requête pour insérer dans la table roomtype
+        String sqlRoomType = "INSERT INTO hotel.roomtype (label, capacity, prix) VALUES (?, ?, ?)";
+        // Requête pour insérer dans la table hotelroom
+        String sqlHotelRoom = "INSERT INTO hotel.hotelroom (hotel_id, room_type_id) VALUES (?, ?)";
+
+        try (
+            PreparedStatement statementRoomType = connection.prepareStatement(sqlRoomType, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement statementHotelRoom = connection.prepareStatement(sqlHotelRoom)
+        ) {
+            // Insertion dans roomtype
+            statementRoomType.setString(1, roomType.getLabel());
+            statementRoomType.setInt(2, roomType.getCapacity());
+            statementRoomType.setInt(3, roomType.getPrix());
+            int rowsAffected = statementRoomType.executeUpdate();
+
+            // Vérifier si l'insertion a réussi
+            if (rowsAffected > 0) {
+                // Récupérer l'ID généré
+                try (ResultSet generatedKeys = statementRoomType.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int roomTypeId = generatedKeys.getInt(1);
+
+                        // Insertion dans hotelroom
+                        statementHotelRoom.setInt(1, hotelId);
+                        statementHotelRoom.setInt(2, roomTypeId);
+
+                        return statementHotelRoom.executeUpdate() > 0;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+ // Update an existing room type and associated hotelroom entries
+    public boolean updateRoomType(Roomtype roomType) throws SQLException {
+        // SQL pour mettre à jour la table roomtype
+        String updateRoomTypeSQL = "UPDATE hotel.roomtype SET label = ?, capacity = ?, prix = ? WHERE id = ?";
+        
+        // SQL pour mettre à jour la table hotelroom
+        String updateHotelRoomSQL = "UPDATE hotel.hotelroom SET room_type_id = ? WHERE room_type_id = ?";
+
+        boolean isUpdated = false;
+
+        try {
+            // Démarrer une transaction
+            connection.setAutoCommit(false);
+
+            // Mettre à jour la table roomtype
+            try (PreparedStatement roomTypeStatement = connection.prepareStatement(updateRoomTypeSQL)) {
+                roomTypeStatement.setString(1, roomType.getLabel());
+                roomTypeStatement.setInt(2, roomType.getCapacity());
+                roomTypeStatement.setInt(3, roomType.getPrix());
+                roomTypeStatement.setInt(4, roomType.getId());
+
+                int roomTypeUpdateCount = roomTypeStatement.executeUpdate();
+                
+                // Vérifier si la mise à jour de roomtype a réussi
+                if (roomTypeUpdateCount > 0) {
+                    // Mettre à jour la table hotelroom si nécessaire
+                    try (PreparedStatement hotelRoomStatement = connection.prepareStatement(updateHotelRoomSQL)) {
+                        hotelRoomStatement.setInt(1, roomType.getId()); // Nouvel id room_type_id (même id ici)
+                        hotelRoomStatement.setInt(2, roomType.getId()); // Ancien id room_type_id
+                        
+                        int hotelRoomUpdateCount = hotelRoomStatement.executeUpdate();
+                        System.out.println(hotelRoomUpdateCount + " rows updated in hotelroom.");
+                    }
+                }
+
+                isUpdated = true;
+            }
+
+            // Valider la transaction
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Annuler la transaction en cas d'erreur
+            connection.rollback();
+            throw e;
+        } finally {
+            // Restaurer l'état par défaut de l'auto-commit
+            connection.setAutoCommit(true);
+        }
+
+        return isUpdated;
+    }
+
+
+    // Delete a room type by ID
+    public boolean deleteRoomType(int roomTypeId) throws SQLException {
+        String sql = "DELETE FROM hotel.roomtype WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, roomTypeId);
+
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    // Retrieve all room types
+    public List<Roomtype> getAllRoomTypes() throws SQLException {
+        String sql = "SELECT * FROM hotel.roomtype";
+        List<Roomtype> roomTypes = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Roomtype roomType = new Roomtype(
+                        resultSet.getInt("id"),
+                        resultSet.getString("label"),
+                        resultSet.getInt("capacity"),
+                        resultSet.getInt("prix")
+                       
+                );
+                roomTypes.add(roomType);
+            }
+        }
+
+        return roomTypes;
+    }
+
+    // Retrieve a room type by ID
+    public Roomtype getRoomTypeById(int roomTypeId) throws SQLException {
+        String sql = "SELECT * FROM hotel.roomtype WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, roomTypeId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Roomtype(
+                            resultSet.getInt("id"),
+                            resultSet.getString("label"),
+                            resultSet.getInt("capacity"),
+                            resultSet.getInt("prix")
+                    
+                    );
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // Retrieve all room types for a specific hotel
+    public List<Roomtype> getRoomTypesByHotelId(int hotelId) throws SQLException {
+        String sql = "SELECT * FROM hotel.roomtype WHERE hotel_id = ?";
+        List<Roomtype> roomTypes = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, hotelId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Roomtype roomType = new Roomtype(
+                            resultSet.getInt("id"),
+                            resultSet.getString("label"),
+                            resultSet.getInt("capacity"),
+                            resultSet.getInt("prix")
+                    );
+                    roomTypes.add(roomType);
+                }
+            }
+        }
+
+        return roomTypes;
+    }
+}

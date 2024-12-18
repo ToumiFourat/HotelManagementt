@@ -1,0 +1,226 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.HotelRoom" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: #fff;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap; /* Permet d'aligner les champs côte à côte */
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            flex: 1 1 calc(50% - 20px); /* Chaque champ occupe 50% de la largeur avec un espace */
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hotel-details {
+            flex-grow: 1;
+        }
+
+        .hotel-details h3 {
+            margin: 0 0 10px;
+            font-size: 1.6em;
+            color: #333;
+        }
+
+        .hotel-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel Search</h1>
+        <form action="${pageContext.request.contextPath}/SearchServlet" method="post">
+            <!-- Champ de ville -->
+            <div class="form-group">
+                <label>City:</label>
+                <select name="city" required>
+                    <option value="Ariana">Ariana</option>
+                    <option value="Sousse">Sousse</option>
+                    <option value="Monastir">Monastir</option>
+                    <option value="ZARZIS">ZARZIS</option>
+                </select>
+            </div>
+
+            <!-- Nombre d'étoiles -->
+            <div class="form-group">
+                <label>Number of Stars:</label>
+                <select name="stars" required>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+            </div>
+
+            <!-- Type de chambre -->
+            <div class="form-group">
+                <label>Room Type:</label>
+                <select name="roomType" required>
+                    <option value="gardenView">Garden View</option>
+                    <option value="seaView">Sea View</option>
+                    <option value="suite">Suite</option>
+                </select>
+            </div>
+
+            <!-- Capacité maximale -->
+            <div class="form-group">
+                <label>Maximum Capacity:</label>
+                <select name="capacity" required>
+                    <option value="1">1 Person</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
+                    <option value="4">4 People</option>
+                </select>
+            </div>
+
+            <!-- Prix minimum -->
+            <div class="form-group">
+                <label>Min Price:</label>
+                <input type="number" name="minPrice" min="0" required>
+            </div>
+
+            <!-- Prix maximum -->
+            <div class="form-group">
+                <label>Max Price:</label>
+                <input type="number" name="maxPrice" min="0" required>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <div class="form-group" style="flex-basis: 100%;">
+                <button type="submit">Search</button>
+            </div>
+        </form>
+
+        <!-- Affichage des résultats -->
+        <div class="results">
+            <h2>Search Results:</h2>
+            <%
+            List<HotelRoom> hotelResults = (List<HotelRoom>) request.getAttribute("hotelResults");
+            if (hotelResults != null && !hotelResults.isEmpty()) {
+                for (HotelRoom hotel : hotelResults) {
+            %>
+            <div class="result-item">
+                <div class="image-container">
+                    <img src="uploads/<%= hotel.getImageUrl() %>" alt="Hotel Image">
+                </div>
+                <div class="hotel-details">
+                    <h3><%= hotel.getHotelName() %></h3>
+                    <p>City: <%= hotel.getCity() %></p>
+                    <p>Stars: 
+                        <% for (int i = 0; i < hotel.getNumberOfStars(); i++) { %>
+                            <i class="fas fa-star" style="color: gold;"></i>
+                        <% } %>
+                    </p>
+                    <p>Room Type: <%= hotel.getRoomType() %></p>
+                    <p>Price: <%= hotel.getPrice() %> TND</p>
+                    <p>Capacity: <%= hotel.getCapacity() %></p>
+                </div>
+            </div>
+            <%
+                }
+            } else {
+            %>
+            <p style="text-align: center;">No results found</p>
+            <%
+            }
+            %>
+        </div>
+    </div>
+</body>
+</html>

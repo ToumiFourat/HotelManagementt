@@ -1,0 +1,86 @@
+import dao.Hoteldao;
+import model.Hotel;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class SearchServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private Hoteldao hoteldao;
+
+    /**
+     * Default constructor
+     */
+    public SearchServlet() {
+        super();
+    }
+
+    /**
+     * Initializes the servlet
+     */
+    @Override
+    public void init() throws ServletException {
+        hoteldao = new Hoteldao();
+    }
+
+    /**
+     * Handles GET requests
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Retrieve search parameters
+        String city = request.getParameter("city");
+        String starsParam = request.getParameter("stars");
+        String roomTypeLabel = request.getParameter("roomType");
+        String capacityParam = request.getParameter("capacity");
+        String minPriceParam = request.getParameter("minPrice");
+        String maxPriceParam = request.getParameter("maxPrice");
+
+        List<Hotel> hotels = new ArrayList<>();
+
+        try {
+            // Convert parameters to appropriate types
+            int stars = starsParam != null && !starsParam.isEmpty() ? Integer.parseInt(starsParam) : 0;
+            int capacity = capacityParam != null && !capacityParam.isEmpty() ? Integer.parseInt(capacityParam) : 0;
+            double minPrice = minPriceParam != null && !minPriceParam.isEmpty() ? Double.parseDouble(minPriceParam) : 0;
+            double maxPrice = maxPriceParam != null && !maxPriceParam.isEmpty() ? Double.parseDouble(maxPriceParam) : Double.MAX_VALUE;
+
+            // Perform hotel search
+            hotels = hoteldao.getHotelsWithRoomTypes(city, stars, roomTypeLabel, capacity, minPrice, maxPrice);
+
+            // Set results as a request attribute
+            request.setAttribute("hotels", hotels);
+
+            // Forward to the results page
+            request.getRequestDispatcher("result.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            request.setAttribute("message", "Invalid input: " + e.getMessage());
+            request.setAttribute("messageType", "error");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input format.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("message", "Database error: " + e.getMessage());
+            request.setAttribute("messageType", "error");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving hotels.");
+        }
+    }
+
+    /**
+     * Handles POST requests
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+}

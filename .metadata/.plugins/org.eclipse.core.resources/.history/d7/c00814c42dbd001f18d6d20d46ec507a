@@ -1,0 +1,256 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.HotelRoom" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        :root {
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --button-gradient: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-background);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap; /* Allow items to wrap */
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            flex: 1 1 calc(50% - 20px); /* Each form group takes up 50% of the width */
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 15px;
+            background: var(--input-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        select {
+    padding: 15px;
+    background: var(--input-background);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary); /* Assurez-vous que la couleur du texte est claire */
+    font-size: 1rem;
+    outline: none;
+}
+
+select option {
+    color: #333; /* Couleur de texte des options */
+    background-color: #fff; /* Fond blanc pour les options */
+}
+
+        button {
+            background: var(--button-gradient);
+            color: var(--text-primary);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #2575fc 0%, #6a11cb 100%);
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.15);
+            color: #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hotel-details {
+            flex-grow: 1;
+        }
+
+        .hotel-details h3 {
+            margin: 0 0 10px;
+            font-size: 1.6em;
+            color: #333;
+        }
+
+        .hotel-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel Search</h1>
+        <form action="${pageContext.request.contextPath}/SearchServlet" method="post">
+            <div class="form-group">
+                <label>City:</label>
+                <select name="city" required>
+                    <option value="Ariana">ARIANA</option>
+                    <option value="Sousse">SOUSSE</option>
+                    <option value="Monastir">MONASTIR</option>
+                    <option value="ZARZIS">ZARZIS</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Number of Stars:</label>
+                <select name="stars" required>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Room Type:</label>
+                <select name="roomType" required>
+                    <option value="gardenView">Chambre Standard</option>
+                    <option value="seaView">Chambre Deluxe</option>
+                    <option value="suite">Suite</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Maximum Capacity:</label>
+                <select name="capacity" required>
+                    <option value="1">1 Person</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
+                    <option value="4">4 People</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Min Price:</label>
+                <input type="number" name="minPrice" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Max Price:</label>
+                <input type="number" name="maxPrice" min="0" required>
+            </div>
+
+            <div class="form-group" style="flex-basis: 100%;">
+                <button type="submit">Search</button>
+            </div>
+        </form>
+
+        <div class="results">
+            <h2>Search Results:</h2>
+            <%
+            List<HotelRoom> hotelResults = (List<HotelRoom>) request.getAttribute("hotelResults");
+            if (hotelResults != null && !hotelResults.isEmpty()) {
+                for (HotelRoom hotel : hotelResults) {
+            %>
+            <div class="result-item">
+                <div class="image-container">
+                    <img src="uploads/<%= hotel.getImageUrl() %>" alt="Hotel Image">
+                </div>
+                <div class="hotel-details">
+                    <h3><%= hotel.getHotelName() %></h3>
+                    <p>City: <%= hotel.getCity() %></p>
+                    <p>Stars: 
+                        <% for (int i = 0; i < hotel.getNumberOfStars(); i++) { %>
+                            <i class="fas fa-star" style="color: gold;"></i>
+                        <% } %>
+                    </p>
+                    <p>Room Type: <%= hotel.getRoomType() %></p>
+                    <p>Price: <%= hotel.getPrice() %> TND</p>
+                    <p>Capacity: <%= hotel.getCapacity() %></p>
+                </div>
+            </div>
+            <%
+                }
+            } else {
+            %>
+            <p style="text-align: center;">No results found</p>
+            <%
+            }
+            %>
+        </div>
+    </div>
+</body>
+</html>

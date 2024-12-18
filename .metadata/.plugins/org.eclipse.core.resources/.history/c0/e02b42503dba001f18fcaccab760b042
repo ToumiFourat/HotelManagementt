@@ -1,0 +1,76 @@
+import java.io.IOException;
+
+import dao.RoomTypeDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.Roomtype;
+
+@WebServlet("/UpdateRoomTypeServlet")
+public class UpdateRoomTypeServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private RoomTypeDAO roomTypeDAO;
+
+    public UpdateRoomTypeServlet() {
+        super();
+    }
+
+    @Override
+    public void init() throws ServletException {
+        roomTypeDAO = new RoomTypeDAO();
+    }
+
+    /**
+     * Handles GET requests
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Read parameters from the form
+        String roomTypeIdStr = request.getParameter("id");
+        String label = request.getParameter("label");
+        String capacityStr = request.getParameter("capacity");
+        String priceStr = request.getParameter("price");
+        String hotelIdStr = request.getParameter("hotelId");
+
+        try {
+            int roomTypeId = Integer.parseInt(roomTypeIdStr);
+            int capacity = Integer.parseInt(capacityStr);
+            int price = Integer.parseInt(priceStr);
+
+            // Créer l'objet Roomtype
+            Roomtype roomType = new Roomtype(roomTypeId, label, capacity, price);
+
+            // Mise à jour du type de chambre et de la table associée
+            boolean success = roomTypeDAO.updateRoomType(roomType);
+
+            if (success) {
+                request.setAttribute("message", "Room type updated successfully!");
+                request.setAttribute("messageType", "success");
+            } else {
+                request.setAttribute("message", "Failed to update room type.");
+                request.setAttribute("messageType", "error");
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("message", "Invalid number format for room type ID, price, or capacity.");
+            request.setAttribute("messageType", "error");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("message", "An error occurred: " + e.getMessage());
+            request.setAttribute("messageType", "error");
+        }
+
+        // Retourner à la page JSP
+        request.getRequestDispatcher("updateRoomType.jsp").forward(request, response);
+    }
+
+    /**
+     * Handles POST requests
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+}

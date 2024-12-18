@@ -1,0 +1,173 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.Hotel" %>
+<%@ page import="dao.Hoteldao" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Type de Chambre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --button-gradient: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-background);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 15px;
+            background: var(--input-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-input::placeholder, .form-select {
+            color: var(--text-secondary);
+        }
+
+        .form-button {
+            background: var(--button-gradient);
+            color: var(--text-primary);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .form-button:hover {
+            opacity: 0.9;
+        }
+        .form-select option {
+    color: #000; /* Texte noir pour les options */
+    background-color: #fff; /* Fond blanc pour une meilleure visibilité */
+}
+.form-input option{
+            color: #000;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1 class="form-title">Ajouter un Type de Chambre</h1>
+        <form class="form" action="${pageContext.request.contextPath}/AddRoomTypeServlet" method="post">
+            <!-- Sélection de l'hôtel -->
+            <select class="form-select" id="hotelId" name="hotelId" required>
+                <option value="" disabled selected>Sélectionnez un Hôtel</option>
+                <% 
+                    // Instancier le DAO
+                    dao.Hoteldao hotelDAO = new dao.Hoteldao();
+                    List<model.Hotel> hotels = hotelDAO.getAllHotels(); // Récupération des hôtels
+
+                    if (hotels != null && !hotels.isEmpty()) {
+                        for (model.Hotel hotel : hotels) {
+                %>
+                            <option value="<%= hotel.getId() %>"><%= hotel.getName() %></option>
+                <%
+                        }
+                    } else {
+                %>
+                    <option disabled>Aucun hôtel disponible</option>
+                <%
+                    }
+                %>
+            </select>
+
+            <!-- Libellé du type de chambre -->
+            </select>
+
+            <!-- Room Type -->
+            <select 
+    class="form-input" 
+    id="label" 
+    name="label" 
+    required
+>
+    <option value="" disabled ${param.label == null ? 'selected' : ''}>Type de chambre</option>
+    <option value="standard" ${param.label == 'standard' ? 'selected' : ''}>Chambre Standard</option>
+    <option value="deluxe" ${param.label == 'deluxe' ? 'selected' : ''}>Chambre Deluxe</option>
+    <option value="suite" ${param.label == 'suite' ? 'selected' : ''}>Suite</option>
+</select>
+
+            <!-- Capacité maximale -->
+            <input 
+                type="number" 
+                class="form-input" 
+                id="capacity" 
+                name="capacity" 
+                min="1" 
+                placeholder="Capacité maximale (Ex: 4)" 
+                required
+            >
+
+            <!-- Prix -->
+            <input 
+                type="number" 
+                class="form-input" 
+                id="prix" 
+                name="prix" 
+                min="0" 
+                placeholder="Prix (en €)" 
+                required
+            >
+
+            <!-- Bouton de soumission -->
+            <button type="submit" class="form-button">Ajouter</button>
+        </form>
+    </div>
+</body>
+</html>

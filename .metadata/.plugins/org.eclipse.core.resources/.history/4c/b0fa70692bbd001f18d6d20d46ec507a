@@ -1,0 +1,169 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --button-gradient: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-background);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 15px;
+            background: var(--input-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-input::placeholder, .form-select {
+            color: var(--text-secondary);
+        }
+
+        .form-button {
+            background: var(--button-gradient);
+            color: var(--text-primary);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .form-button:hover {
+            opacity: 0.9;
+        }
+
+        .form-select option {
+            color: #000;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1 class="form-title">Modifier la chambre</h1>
+        <form class="form" action="${pageContext.request.contextPath}/UpdateRoomTypeServlet" method="post">
+            <!-- Hidden ID for identifying the room type -->
+            <input type="hidden" name="id" value="${param.id}" />
+
+            <!-- Dropdown for selecting hotel -->
+            <select class="form-select" id="hotelId" name="hotelId" required>
+                <option value="" disabled selected>Sélectionnez un Hôtel</option>
+                <% 
+                    dao.Hoteldao hotelDAO = new dao.Hoteldao();
+                    List<model.Hotel> hotels = hotelDAO.getAllHotels();
+
+                    if (hotels != null && !hotels.isEmpty()) {
+                        for (model.Hotel hotel : hotels) {
+                %>
+                    <option value="<%= hotel.getId() %>"><%= hotel.getName() %></option>
+                <%
+                        }
+                    } else {
+                %>
+                    <option disabled>Aucun hôtel disponible</option>
+                <%
+                    }
+                %>
+            </select>
+
+            <!-- Room Type -->
+            <select 
+    class="form-input" 
+    id="label" 
+    name="label" 
+    required
+>
+    <option value="" disabled selected>Type de chambre</option>
+    <option value="standard" ${param.label === "standard" ? "selected" : ""}>Chambre Standard</option>
+    <option value="deluxe" ${param.label === "deluxe" ? "selected" : ""}>Chambre Deluxe</option>
+    <option value="suite" ${param.label === "suite" ? "selected" : ""}>Suite</option>
+</select>
+
+
+            <!-- Capacity -->
+            <input 
+                type="number" 
+                class="form-input" 
+                id="capacity" 
+                name="capacity" 
+                min="1" 
+                placeholder="Capacité" 
+                value="${param.capacity}" 
+                required
+            >
+
+            <!-- Price -->
+            <input 
+                type="number" 
+                class="form-input" 
+                id="price" 
+                name="price" 
+                min="0" 
+                placeholder="Prix" 
+                value="${param.price}" 
+                required
+            >
+
+            <!-- Submit Button -->
+            <button type="submit" class="form-button">Enregistrer les modifications</button>
+        </form>
+    </div>
+</body>
+</html>

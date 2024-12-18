@@ -1,0 +1,9 @@
+127.0.0.1 - - [07/Dec/2024:00:15:43 +0100] "GET / HTTP/1.1" 404 752
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:44 +0100] "GET /Hotell/views/login.jsp HTTP/1.1" 200 2708
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:46 +0100] "GET /favicon.ico HTTP/1.1" 404 763
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:52 +0100] "POST /Hotell/LoginServlet HTTP/1.1" 200 11290
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:52 +0100] "GET /Hotell/uploads/doc12.png HTTP/1.1" 200 106748
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:52 +0100] "GET /Hotell/uploads/hotel3.avif HTTP/1.1" 200 363523
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:52 +0100] "GET /Hotell/uploads/profile_pic.png HTTP/1.1" 200 70259
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:15:52 +0100] "GET /Hotell/uploads/b-removebg-preview%20(1).png HTTP/1.1" 200 259008
+0:0:0:0:0:0:0:1 - - [07/Dec/2024:00:16:00 +0100] "GET /Hotell/views/addRoomType.jsp HTTP/1.1" 200 2628

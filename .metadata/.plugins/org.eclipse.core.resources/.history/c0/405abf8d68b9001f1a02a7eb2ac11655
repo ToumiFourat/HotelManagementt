@@ -1,0 +1,351 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+	<%@ page import="java.util.List" %>
+<%@ page import="model.HotelRoom" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel Search</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: #fff;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+
+        .results {
+            margin-top: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-item img {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .result-item:hover {
+            transform: scale(1.05);
+        }
+
+        .result-item h3 {
+            margin: 0;
+            color: #fff;
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            color: #ddd;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+        /* Résultats avec design avancé */
+        .result-item {
+            display: flex;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        .result-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Conteneur pour l'image */
+
+.result-item .image-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex; /* Centrer l'image */
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0; /* Couleur de fond pour les espaces vides */
+}
+
+/* Image à l'intérieur du conteneur */
+.result-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Affiche l'image entière sans la couper */
+}
+
+
+
+        /* Détails alignés */
+        .hotel-details {
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+
+        .hotel-details h3 {
+            margin: 0 0 10px;
+            font-size: 1.6em;
+            color: #555;
+        }
+
+        .hotel-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+        /* Conteneur principal de la modale */
+.modal {
+    display: none; /* Masqué par défaut */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Fond semi-transparent */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Contenu de la modale */
+.modal-content {
+    position: relative;
+    max-width: 80%;
+    max-height: 80%;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    overflow: auto; /* Pour les grandes images */
+    text-align: center;
+}
+
+/* Image agrandie */
+.modal-content img {
+    width: 100%;
+    height: auto;
+}
+
+/* Bouton de fermeture */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    text-align: center;
+}
+
+.modal-close:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel Search</h1>
+        <form action="${pageContext.request.contextPath}/SearchServlet"  method="post">
+        <label>City:</label>
+        <select name="city" required>
+            <option value="Ariana">Ariana</option>
+            <option value="Sousse">Sousse</option>
+            <option value="Monastir">Monastir</option>
+        </select>
+
+        <label>Number of Stars:</label>
+        <select name="stars" required>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+
+        <label>Room Type:</label>
+        <select name="roomType" required>
+            <option value="gardenView">Garden View</option>
+            <option value="seaView">Sea View</option>
+            <option value="suite">Suite</option>
+        </select>
+
+        <label>Maximum Capacity:</label>
+        <select name="capacity" required>
+            <option value="1">1 Person</option>
+            <option value="2">2 People</option>
+            <option value="3">3 People</option>
+            <option value="4">4 People</option>
+        </select>
+
+        <label>Min Price:</label>
+        <input type="number" name="minPrice" min="0" required>
+
+        <label>Max Price:</label>
+        <input type="number" name="maxPrice" min="0" required>
+
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+     <!-- Afficher les résultats si disponibles -->
+        <h2>Search Results:</h2>
+        <div>
+            <%
+            List<HotelRoom> hotelResults = (List<HotelRoom>) request.getAttribute("hotelResults");
+            if (hotelResults != null && !hotelResults.isEmpty()) {
+                for (HotelRoom hotel : hotelResults) {
+            %>
+                <div class="result-item">
+    <div class="image-container">
+        <img src="uploads/<%= hotel.getImageUrl() %>" alt="Hotel Image" 
+             onclick="openModal('uploads/<%=hotel.getImageUrl()%>')">
+    </div>
+    <div class="details">
+        <h3><%= hotel.getHotelName() %></h3>
+        <p>City: <%= hotel.getCity() %></p>
+        <p>Stars: <%= hotel.getNumberOfStars() %></p>
+        <p>Room Type: <%= hotel.getRoomType() %></p>
+        <p>Price: <%= hotel.getPrice() %> TND</p>
+        <p>Capacity: <%= hotel.getCapacity() %></p>
+    </div>
+</div>
+
+            <%
+                }
+            } else {
+            %>
+                <p style="text-align: center; font-size: 1.2em; color: #333;">Aucun résultat trouvé</p>
+            <%
+            }
+            %>
+        </div>
+    </div>
+    
+   <!-- Modal pour afficher l'image agrandie -->
+<div class="modal" id="imageModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <img id="modalImage" src="" alt="Hotel Image Agrandie">
+    </div>
+</div>
+    
+    <script>
+    function openModal(imageSrc) {
+        console.log('Ouverture de la modale'); // Debug
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = imageSrc;
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        console.log('Fermeture de la modale'); // Debug
+        const modal = document.getElementById('imageModal');
+        modal.style.display = 'none';
+    }
+
+    </script>
+    
+    
+    
+    
+    
+</body>
+</html>

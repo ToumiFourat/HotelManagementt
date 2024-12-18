@@ -1,0 +1,12 @@
+127.0.0.1 - - [03/Dec/2024:21:29:12 +0100] "GET / HTTP/1.1" 404 752
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:29:12 +0100] "GET /Hotell/views/login.jsp HTTP/1.1" 200 2708
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:29:34 +0100] "POST /Hotell/LoginServlet HTTP/1.1" 200 3591
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:30:03 +0100] "GET /Hotell/views/addAgent.jsp HTTP/1.1" 200 2651
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:30:22 +0100] "POST /Hotell/AddAgentServlet HTTP/1.1" 200 2651
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:13 +0100] "POST /Hotell/AddAgentServlet HTTP/1.1" 200 2651
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:30 +0100] "POST /Hotell/LoginServlet HTTP/1.1" 200 3711
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:30 +0100] "GET /favicon.ico HTTP/1.1" 404 763
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:39 +0100] "POST /Hotell/LoginServlet HTTP/1.1" 200 10585
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:39 +0100] "GET /Hotell/uploads/hotel3.avif HTTP/1.1" 200 363523
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:39 +0100] "GET /Hotell/uploads/doc12.png HTTP/1.1" 200 106748
+0:0:0:0:0:0:0:1 - - [03/Dec/2024:21:32:39 +0100] "GET /Hotell/uploads/b-removebg-preview%20(1).png HTTP/1.1" 200 259008
